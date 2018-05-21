@@ -1,11 +1,13 @@
 package edu.pg.virtualworld;
 
+import edu.pg.virtualworld.organisms.Human;
+
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.*;
 
-public class MainDialog extends JDialog {
+public class MainDialog extends JFrame {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -32,10 +34,38 @@ public class MainDialog extends JDialog {
 
     public MainDialog(int width, int height) {
         setContentPane(contentPane);
-        setModal(true);
+        //setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         Logger logger=new Logger(logTextArea,logsScrollPane);
         World world=new World(width,height,logger);
+        this.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
+                logger.log("Wcisniete!!!!!!!!!");
+            }
+
+            @Override
+            public void keyPressed(KeyEvent keyEvent) {
+                logger.log("Wcisniete!!!!!!!!!");
+            }
+
+            @Override
+            public void keyReleased(KeyEvent keyEvent) {
+
+            }
+        });
+        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+                .addKeyEventDispatcher(new KeyEventDispatcher() {
+                    @Override
+                    public boolean dispatchKeyEvent(KeyEvent keyEvent) {
+                        if(keyEvent.getID() == KeyEvent.KEY_PRESSED) {
+                            if(keyEvent.getKeyCode()==KeyEvent.VK_ESCAPE)  onCancel();
+                            Human myHuman=world.getHuman();
+                            if(myHuman!=null)myHuman.keyTyped(keyEvent);
+                        }
+                        return true;
+                    }
+                });
         createLabels(width, height,world);
         board.setLayout(new GridLayout(width, height));
         for (int i = 0; i < width * height; i++) {
@@ -73,7 +103,7 @@ public class MainDialog extends JDialog {
         newGameButton.addActionListener(actionEvent -> {//wywolanie save ze swiata
             logMessage("New game!");
         });
-        Timer timer=new Timer(2000, new ActionListener() {
+        Timer timer=new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 world.playRound();
@@ -119,7 +149,14 @@ public class MainDialog extends JDialog {
         int width=Integer.parseInt(JOptionPane.showInputDialog("Width: "));
 
         MainDialog dialog = new MainDialog(width,height);
+        dialog.requestFocusInWindow();
         dialog.pack();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                dialog.requestFocusInWindow();
+            }
+        });
         dialog.setVisible(true);
         //JOptionPane.showMessageDialog(dialog, "Eggs are not supposed to be green.");
         //System.exit(0);

@@ -1,6 +1,7 @@
 package edu.pg.virtualworld;
 
 import edu.pg.virtualworld.actions.Action;
+import edu.pg.virtualworld.organisms.Human;
 import edu.pg.virtualworld.organisms.Organism;
 import sun.rmi.runtime.Log;
 
@@ -43,7 +44,7 @@ public class World {
     private Organism whoIsThere(Location location) {
         handleWorldsEdges(location);
         for (Organism o : organisms) {
-            if (o.getLocation() == location)
+            if (o.getLocation().equals(location))
                 return o;
         }
         return null;
@@ -263,5 +264,11 @@ public class World {
     }
     private void killAllOrganisms() {
         organisms.clear();
+    }
+    public Human getHuman(){
+        for(Organism o :organisms){
+            if(o instanceof Human)return (Human)o;
+        }
+        return null;
     }
 }

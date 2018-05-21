@@ -52,34 +52,20 @@ public class Human extends Animal{
                     magicPotion = 5;
                     usingSpecialAbility = 1;
                 }
-                waitingForArrow = false;
                 break;
             case KeyEvent.VK_UP:
-                if (waitingForArrow)
-                    myMove = new Location(-1, 0);
-                waitingForArrow = false;
+                myMove = new Location(-1, 0);
                 break;
             case KeyEvent.VK_DOWN:
-                if (waitingForArrow)
-                    myMove = new Location(1, 0);
-                waitingForArrow = false;
+                myMove = new Location(1, 0);
                 break;
             case KeyEvent.VK_LEFT:
-                if (waitingForArrow)
-                    myMove = new Location(0, -1);
-                waitingForArrow = false;
-            case KeyEvent.VK_RIGHT:
-                if (waitingForArrow)
-                    myMove = new Location(0, 1);
-                waitingForArrow = false;
+                myMove = new Location(0, -1);
                 break;
-            case 224:
-                waitingForArrow = true;
-                myMove = new Location(0, 0);
+            case KeyEvent.VK_RIGHT:
+                myMove = new Location(0, 1);
                 break;
             default:
-                waitingForArrow = false;
-                myMove = new Location(0, 0);
                 break;
 
         }

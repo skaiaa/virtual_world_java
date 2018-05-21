@@ -15,7 +15,7 @@ public class OrganismGenerator {
     }
 
     public static Vector<Organism> getInitialOrganisms(int width, int height) {
-        String allSymbols = "gduuuuuuuusbWWWWAAATTTFFF";//bardzo wazny string
+        String allSymbols = "ggggduuuuusbWWWWAAATTTFFF";//bardzo wazny string
         Vector<Organism> initialOrganisms=new Vector<>();
         for (int i = 0; i < allSymbols.length(); i++) {//tutaj robie po jednym kazdego rodzaju
             initialOrganisms.add(getOrganism(allSymbols.charAt(i)));
