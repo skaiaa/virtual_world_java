@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.Vector;
 
 public class MainDialog extends JFrame {
-    private final Component modalToComponent=new Component() {
+    private final Component modalToComponent = new Component() {
     };
     private JPanel contentPane;
     private JButton buttonOK;
@@ -34,31 +34,43 @@ public class MainDialog extends JFrame {
 
     private void createLabels(int width, int height, World world, ButtonGenerator buttonGenerator) {
         labels = new JButton[height * width];
-        for(int i=0;i<labels.length;i++){
-            int idx=i;
+        for (int i = 0; i < labels.length; i++) {
+            int idx = i;
             labels[i] = buttonGenerator.create();
             labels[i].addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent mouseEvent) {
-                    Location l=new Location(idx/width,idx%width);
-                    if(world.whoIsThere(l)==null){
+                    Location l = new Location(idx / width, idx % width);
+                    if (world.whoIsThere(l) == null) {
                         timer.stop();
-                        popUp(world,l);
-                        drawBoard(width,height,world,labels);
+                        popUp(world, l);
+                        drawBoard(width, height, world, labels);
                         timer.start();
-                    }
-                    else logMessage("Field taken");
+                    } else logMessage("Field taken");
                 }
-                @Override public void mousePressed(MouseEvent mouseEvent) { }
-                @Override public void mouseReleased(MouseEvent mouseEvent) { }
-                @Override public void mouseEntered(MouseEvent mouseEvent) { }
-                @Override public void mouseExited(MouseEvent mouseEvent) { }
+
+                @Override
+                public void mousePressed(MouseEvent mouseEvent) {
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent mouseEvent) {
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent mouseEvent) {
+                }
+
+                @Override
+                public void mouseExited(MouseEvent mouseEvent) {
+                }
             });
             labels[i].setOpaque(true);
-            labels[i].setSize(50,50);
+            labels[i].setSize(50, 50);
         }
-        drawBoard(width,height,world,labels);
+        drawBoard(width, height, world, labels);
     }
+
     private void drawBoard(int width, int height, World world, JButton[] labels) {
         int i = 0;
         for (int k = 0; k < height; k++) {
@@ -78,13 +90,14 @@ public class MainDialog extends JFrame {
         }
         board.updateUI();
     }
-    private void popUp(World world,Location location){
+
+    private void popUp(World world, Location location) {
         JPanel panel = new JPanel();
         panel.add(new JLabel("Please make a selection:"));
         DefaultComboBoxModel box = new DefaultComboBoxModel<String>();
-        String s="WATSFgusbd";
-        Vector<Organism> org=new Vector<>();
-        for(int i=0;i<s.length();i++){
+        String s = "WATSFgusbd";
+        Vector<Organism> org = new Vector<>();
+        for (int i = 0; i < s.length(); i++) {
             org.add(OrganismGenerator.getOrganism(s.charAt(i)));
             box.addElement(org.elementAt(i).getName());
         }
@@ -97,27 +110,28 @@ public class MainDialog extends JFrame {
                 org.elementAt(comboBox.getSelectedIndex()).setLocation(location);
                 world.organisms.add(org.elementAt(comboBox.getSelectedIndex()));
                 Collections.sort(world.organisms);
-                drawBoard(world.getWidth(),world.getHeight(),world,labels);
+                drawBoard(world.getWidth(), world.getHeight(), world, labels);
                 break;
         }
     }
+
     private MainDialog(int width, int height, ButtonGenerator bg) {
         setContentPane(contentPane);
         //setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        Logger logger=new Logger(logTextArea,logsScrollPane);
-        World world=new World(width,height,logger);
+        Logger logger = new Logger(logTextArea, logsScrollPane);
+        World world = new World(width, height, logger);
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
-                .addKeyEventDispatcher(keyEvent ->  {
-                        if(keyEvent.getID() == KeyEvent.KEY_PRESSED) {
-                            if(keyEvent.getKeyCode()==KeyEvent.VK_ESCAPE)  onCancel();
-                            Human myHuman=world.getHuman();
-                            if(myHuman!=null) myHuman.keyTyped(keyEvent);
+                .addKeyEventDispatcher(keyEvent -> {
+                            if (keyEvent.getID() == KeyEvent.KEY_PRESSED) {
+                                if (keyEvent.getKeyCode() == KeyEvent.VK_ESCAPE) onCancel();
+                                Human myHuman = world.getHuman();
+                                if (myHuman != null) myHuman.keyTyped(keyEvent);
+                            }
+                            return false;
                         }
-                        return false;
-                    }
                 );
-        createLabels(width, height,world,bg);
+        createLabels(width, height, world, bg);
         board.setLayout(new GridLayout(width, height));
         for (int i = 0; i < width * height; i++) {
             board.add(labels[i]);
@@ -152,7 +166,7 @@ public class MainDialog extends JFrame {
                 try {
                     world.saveToFile(new FileOutputStream(out));
                 } catch (IOException e) {
-                    logger.log("Error saving file! "+e.getMessage());
+                    logger.log("Error saving file! " + e.getMessage());
                 }
             }
             logMessage("Game saved!");
@@ -178,24 +192,23 @@ public class MainDialog extends JFrame {
             logMessage("New game!");
         });
         pauseButton.addActionListener(actionEvent -> {//wywolanie save ze swiata
-            if(timer.isRunning()) {
+            if (timer.isRunning()) {
                 timer.stop();
                 pauseButton.setText("Resume");
                 logMessage("Game paused!");
-            }
-            else {
+            } else {
                 timer.start();
                 pauseButton.setText("Pause");
                 logMessage("Game resumed!");
             }
 
         });
-        timer=new Timer(1500,actionEvent-> {
-                drawBoard(world.getWidth(),world.getHeight(),world,labels);
-                world.playRound();
-                drawBoard(world.getWidth(),world.getHeight(),world,labels);
-                board.updateUI();
-            }
+        timer = new Timer(1500, actionEvent -> {
+            drawBoard(world.getWidth(), world.getHeight(), world, labels);
+            world.playRound();
+            drawBoard(world.getWidth(), world.getHeight(), world, labels);
+            board.updateUI();
+        }
         );
         timer.setRepeats(true);
         timer.start();
@@ -210,24 +223,26 @@ public class MainDialog extends JFrame {
     }
 
     public static void main(String[] args) {
-        int height=Integer.parseInt(JOptionPane.showInputDialog("Height: "));
-        int width=Integer.parseInt(JOptionPane.showInputDialog("Width: "));
+        int height = Integer.parseInt(JOptionPane.showInputDialog("Height: "));
+        int width = Integer.parseInt(JOptionPane.showInputDialog("Width: "));
         String whichButton = JOptionPane.showInputDialog("What kind of button (hex or square, default square): ");
         ButtonGenerator bg;
 
-        if(whichButton.equals("hex")) bg=new HexButtonGenerator();
-        else bg=new SquareButtonGenerator();
+        if (whichButton.equals("hex")) bg = new HexButtonGenerator();
+        else bg = new SquareButtonGenerator();
 
-        MainDialog dialog = new MainDialog(width,height,bg);
+        MainDialog dialog = new MainDialog(width, height, bg);
         dialog.requestFocusInWindow();
         dialog.pack();
-        SwingUtilities.invokeLater(()->  dialog.requestFocusInWindow() );
+        SwingUtilities.invokeLater(() -> dialog.requestFocusInWindow());
         dialog.setVisible(true);
     }
+
     private void createUIComponents() { //do forma
     }
+
     private void logMessage(String message) {
-        logTextArea.append(message+"\n");
+        logTextArea.append(message + "\n");
         logsScrollPane.getVerticalScrollBar().setValue(logsScrollPane.getVerticalScrollBar().getMaximum());
     }
 }

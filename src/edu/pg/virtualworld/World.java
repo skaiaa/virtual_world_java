@@ -14,46 +14,49 @@ public class World {
     public Vector<Organism> organisms;
     private Logger logger;
 
-    public World(int width, int height, Logger logger){
-        this.width=width;
-        this.height=height;
-        fields=width*height;
-        this.logger=logger;
+    public World(int width, int height, Logger logger) {
+        this.width = width;
+        this.height = height;
+        fields = width * height;
+        this.logger = logger;
         organisms = OrganismGenerator.getInitialOrganisms(width, height);
     }
 
     public int getWidth() {
         return width;
     }
-    public int getHeight(){
+
+    public int getHeight() {
         return height;
     }
 
     public Organism whoIsThere(Location location) {
-        location=handleWorldsEdges(location);
+        location = handleWorldsEdges(location);
         for (Organism o : organisms) {
             if (o.getLocation().equals(location))
                 return o;
         }
         return null;
     }
+
     private Location handleWorldsEdges(Location location) {
-        if (location.x < 0)location.x = height - 1;
-        if (location.x == height)location.x = 0;
-        if (location.y < 0)location.y = width - 1;
-        if (location.y == width)location.y = 0;
+        if (location.x < 0) location.x = height - 1;
+        if (location.x == height) location.x = 0;
+        if (location.y < 0) location.y = width - 1;
+        if (location.y == width) location.y = 0;
         return location;
     }
 
     public void playRound() {
         Vector<Organism> tmpOrganisms = new Vector<>(organisms);//jak w trakcie tury dodam cos do organizmow to nie moge iterowac po czyms do czego dodaje
-        while(!tmpOrganisms.isEmpty()){
+        while (!tmpOrganisms.isEmpty()) {
             //if ((tmpOrganisms.elementAt(0)).getSymbol() == 'H') logger.log("Your turn!");
             if (executeActionsAndCheckEndOfGame(tmpOrganisms.elementAt(0),
-                    (tmpOrganisms.elementAt(0)).action(organisms), tmpOrganisms))return;
+                    (tmpOrganisms.elementAt(0)).action(organisms), tmpOrganisms)) return;
         }
         Collections.sort(organisms);
     }
+
     private Boolean executeActionsAndCheckEndOfGame(Organism organism, Action action, Vector<Organism> tmpOrganisms) {
         Boolean killedOneself = false;
         if (action.isMoving()) {
@@ -62,8 +65,7 @@ public class World {
             if (organismAlreadyThere == null) {
                 //logger.log(organism.getName() + " moving to " + location.y + " " + location.x);
                 organism.setLocation(location);
-            }
-            else {//kolizje
+            } else {//kolizje
                 killedOneself = executeCollisionsAndCheckIfKilledOneself(organism,
                         organism.collision(organismAlreadyThere, location), organismAlreadyThere, tmpOrganisms);
             }
@@ -73,14 +75,14 @@ public class World {
             for (Location location : spread) {
                 Organism organismAlreadyThere = whoIsThere(location);
                 //logger.log(organism->getName() + " trying to spread to " + to_string(location.y) + " " + to_string(location.x));
-                if (organismAlreadyThere == null && organisms.size()<fields) {
+                if (organismAlreadyThere == null && organisms.size() < fields) {
                     Organism newOrganism = OrganismGenerator.getOrganism(organism.getSymbol());
                     newOrganism.setLocation(location);
                     //logger.log(organism.getName() + " is spreading to " + location.y + " " + location.x);
                     organisms.add(newOrganism);
                 }
             }
-            if(!action.kills().isEmpty()) performKillingSpree(action.kills(),organism,null,tmpOrganisms);
+            if (!action.kills().isEmpty()) performKillingSpree(action.kills(), organism, null, tmpOrganisms);
             //performKillingSpree(collision.kills(), organism, organismAlreadyThere, tmpOrganisms);
 
         }
@@ -106,46 +108,46 @@ public class World {
     public void loadFromFile(FileInputStream is) {
         killAllOrganisms();
         BufferedReader r = new BufferedReader(new InputStreamReader(is));
-        String[] dimensions= new String[0];
+        String[] dimensions = new String[0];
         try {
             dimensions = r.readLine().split(" ");
         } catch (IOException e) {
             logger.log("Cannot read dimensions!");
         }
-        width=Integer.parseInt(dimensions[0]);
-        height=Integer.parseInt(dimensions[1]);
+        width = Integer.parseInt(dimensions[0]);
+        height = Integer.parseInt(dimensions[1]);
 
         String line;
         try {
             line = r.readLine();
-            while(line!=null){
-                if(line.isEmpty()){
-                    line=r.readLine();
+            while (line != null) {
+                if (line.isEmpty()) {
+                    line = r.readLine();
                     continue;
                 }
-                String[] stats=line.split(" ");
-                Organism o=OrganismGenerator.getOrganism(stats[0].charAt(0));
-                o.getStatsFromFile(Arrays.copyOfRange(stats,1,stats.length));
+                String[] stats = line.split(" ");
+                Organism o = OrganismGenerator.getOrganism(stats[0].charAt(0));
+                o.getStatsFromFile(Arrays.copyOfRange(stats, 1, stats.length));
                 organisms.add(o);
-                line=r.readLine();
+                line = r.readLine();
             }
         } catch (IOException e) {
             logger.log("Cannot read organisms!");
-        }
-        catch (StringIndexOutOfBoundsException e){
+        } catch (StringIndexOutOfBoundsException e) {
             logger.log(":C");
         }
     }
+
     private Boolean executeCollisionsAndCheckIfKilledOneself(Organism organism,
                                                              Action collision,
                                                              Organism organismAlreadyThere,
-                                                             Vector<Organism>tmpOrganisms) {
+                                                             Vector<Organism> tmpOrganisms) {
         Boolean killedOneself = false;
         if (collision.isReproducing()) {
             Location location = collision.getReproduce();
             //logger.log(organism.getName() + " trying to reproduce on " + location.y + " " + location.x);
             Organism organismOnPlace = whoIsThere(location);
-            if (organismOnPlace == null && organisms.size()<fields) {
+            if (organismOnPlace == null && organisms.size() < fields) {
                 logger.log("Successfully reproduced!");
                 Organism child = OrganismGenerator.getOrganism(organism.getSymbol());
                 child.setLocation(location);
@@ -170,8 +172,7 @@ public class World {
                 organismAlreadyThere.setLocation(collision.getCatch());
                 //organism zmienia lokacje na location z getmove(tam gdzie byl organismAlreadyThere, mozna najpierw)
                 //organismAlreadyThere zmienia swoja lokacje na ta z getcatch
-            }
-            else {
+            } else {
                 logger.log(organismAlreadyThere.getName() + " didn't manage to run away!");
                 Location possibleLocation = organismAlreadyThere.getLocation();
                 killedOneself = performKillingSpree(collision.kills(), organism, organismAlreadyThere, tmpOrganisms);
@@ -187,7 +188,7 @@ public class World {
 
 
     //tutaj zabijamy i sprawdzamy czy nasz organism sie nie zabil od razu
-    private Boolean performKillingSpree(Vector<Organism>killed, Organism killer,
+    private Boolean performKillingSpree(Vector<Organism> killed, Organism killer,
                                         Organism organismAlreadyThere, Vector<Organism> tmpOrganisms) {
         Boolean killedOneself = false;
         for (Organism victim : killed) {
@@ -196,7 +197,7 @@ public class World {
             if (!victim.isImmuneToKillingBy(killer)) {
                 if (victim.getLocation() == killer.getLocation()) {
                     killedOneself = true;
-                    if(organismAlreadyThere!=null) nameOfKiller = organismAlreadyThere.getName();
+                    if (organismAlreadyThere != null) nameOfKiller = organismAlreadyThere.getName();
                 }
                 if (victim.isIncreasingStrength()) {
                     killer.setStrength(killer.getStrength() + victim.getIncrease());
@@ -204,13 +205,14 @@ public class World {
                 }
                 int positionInRound = getPositionInVector(victim, tmpOrganisms);
                 int positionInWorld = getPositionInVector(victim, organisms);
-                if(positionInRound>-1)tmpOrganisms.remove(positionInRound);
+                if (positionInRound > -1) tmpOrganisms.remove(positionInRound);
                 organisms.remove(positionInWorld);
             }
-            logger.log(nameOfVictim  + " was eaten by " + nameOfKiller);
+            logger.log(nameOfVictim + " was eaten by " + nameOfKiller);
         }
         return killedOneself;
     }
+
     private int getPositionInVector(Organism victim, Vector<Organism> organisms) {
         int position = 0;
         for (Organism o : organisms) {
@@ -221,16 +223,19 @@ public class World {
         }
         return -1;//nie ma go w tym vectorze
     }
+
     private void killAllOrganisms() {
         organisms.clear();
     }
-    public Human getHuman(){
-        for(Organism o :organisms){
-            if(o instanceof Human)return (Human)o;
+
+    public Human getHuman() {
+        for (Organism o : organisms) {
+            if (o instanceof Human) return (Human) o;
         }
         return null;
     }
-    public void createNewWorld(){
+
+    public void createNewWorld() {
         killAllOrganisms();
         organisms = OrganismGenerator.getInitialOrganisms(width, height);
     }

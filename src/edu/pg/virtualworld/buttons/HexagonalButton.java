@@ -7,8 +7,8 @@ class HexagonalButton extends JButton {
     private static final long serialVersionUID = 1L;
     private static final int SIDES = 6;
     private static final int SIDE_LENGTH = 50;
-    public static final int LENGTH = 95;
-    public static final int WIDTH = 105;
+    private static final int LENGTH = 95;
+    private static final int WIDTH = 105;
 
 
     public HexagonalButton() {

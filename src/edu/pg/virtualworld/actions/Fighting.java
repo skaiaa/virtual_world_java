@@ -7,13 +7,23 @@ import java.util.Vector;
 
 public class Fighting extends Action {
     private Location fightLocation;
-    private Vector<Organism>toKill;
-    public Fighting(Location fightLocation1, Vector<Organism>toKill){
-        this.toKill=toKill;
-        fightLocation=fightLocation1;
+    private Vector<Organism> toKill;
+
+    public Fighting(Location fightLocation1, Vector<Organism> toKill) {
+        this.toKill = toKill;
+        fightLocation = fightLocation1;
     }
-    public Boolean isFighting() { return true; }
-    public Location getFight() { return fightLocation; }
-    public Vector<Organism> kills() { return toKill; }
-        }
+
+    public Boolean isFighting() {
+        return true;
+    }
+
+    public Location getFight() {
+        return fightLocation;
+    }
+
+    public Vector<Organism> kills() {
+        return toKill;
+    }
+}
 

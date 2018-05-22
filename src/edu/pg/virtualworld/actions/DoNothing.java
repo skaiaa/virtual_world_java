@@ -5,5 +5,7 @@ import edu.pg.virtualworld.organisms.Organism;
 import java.util.Vector;
 
 public class DoNothing extends Action {
-        public Vector<Organism> kills() { return new Vector<>(); }
+    public Vector<Organism> kills() {
+        return new Vector<>();
+    }
 }

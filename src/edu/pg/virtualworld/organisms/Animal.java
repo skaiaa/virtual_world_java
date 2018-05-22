@@ -8,9 +8,11 @@ import java.util.Vector;
 
 public abstract class Animal extends Organism {
     int step = 1, strength;
+
     Animal(int initialStrength) {
         strength = initialStrength;
     }
+
     void setStep(int newStep) {
         step = newStep;
     }
@@ -18,12 +20,15 @@ public abstract class Animal extends Organism {
     public int getStrength() {
         return strength;
     }
+
     public void setStrength(int s) {
         strength = s;
     }
+
     public String getInfoForSave() {
         return age + " " + step + " " + strength + " " + getLocation().x + " " + getLocation().y + "\n";
     }
+
     public void getStatsFromFile(String[] line) {
         age = Integer.parseInt(line[0]);
         step = Integer.parseInt(line[1]);
@@ -31,28 +36,30 @@ public abstract class Animal extends Organism {
         location.x = Integer.parseInt(line[3]);
         location.y = Integer.parseInt(line[4]);
     }
+
     public Location chooseNewLocation(Location fromWhere) {
-        Random random=new Random();
+        Random random = new Random();
         Location changeInLocation = new Location(0, 0);
         while ((changeInLocation.x == 0) && (changeInLocation.y == 0)
                 || (getLocation().equals(fromWhere.add(changeInLocation)))) {//nie wylosuje miejsca gdzie stoje, kiedy rozmnazam
             if (random.nextBoolean())
-                changeInLocation.changeTo(( random.nextInt(step)+ 1)*(random.nextBoolean()?1:-1) , 0);
-            else changeInLocation.changeTo(0,  (random.nextInt(step)+ 1)*(random.nextBoolean()?1:-1));
+                changeInLocation.changeTo((random.nextInt(step) + 1) * (random.nextBoolean() ? 1 : -1), 0);
+            else changeInLocation.changeTo(0, (random.nextInt(step) + 1) * (random.nextBoolean() ? 1 : -1));
         }
         return new Location(fromWhere.add(changeInLocation));
     }
+
     public Action action(Vector<Organism> organisms) {
         return new Moving(chooseNewLocation(getLocation()), new Vector<>());
     }
+
     public Action collision(Organism withOrganism, Location place) {
-        Vector<Organism>toKill=new Vector<>();
-        if (withOrganism.getSymbol() == getSymbol())return new Reproducing(chooseNewLocation(place));
+        Vector<Organism> toKill = new Vector<>();
+        if (withOrganism.getSymbol() == getSymbol()) return new Reproducing(chooseNewLocation(place));
         else {
             if (withOrganism.getStrength() <= getStrength()) {
                 toKill.add(withOrganism);
-            }
-            else {
+            } else {
                 toKill.add(this);//przegral i sam sie zabija:(
             }
             if (withOrganism.isDeflectingAttack(this)) {
