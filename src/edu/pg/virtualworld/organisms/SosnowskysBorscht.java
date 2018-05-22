@@ -19,24 +19,28 @@ public class SosnowskysBorscht extends Plant {
     public Action action(Vector<Organism> organisms) {
         Random random=new Random();
         Vector<Location> spreadingLocations=new Vector<>();
-        String animalSymbols = "WSFAT";
-        Vector<Organism> toKill=new Vector<Organism>();
+        String animalSymbols = "WSFATH";
+        Vector<Organism> toKill=new Vector<>();
         Boolean SomeoneKilled = false;
         for (Organism l:organisms) {
-            for (int i = 0; i < animalSymbols.length(); i++){
-                if (l.getSymbol() == animalSymbols.charAt(i)) {
+                if (l instanceof Animal &&
+                        (  (l.getLocation().equals(location.add(new Location(-1,0))))
+                        || (l.getLocation().equals(location.add(new Location(1,0))))
+                        || (l.getLocation().equals(location.add(new Location(0,-1))))
+                        || (l.getLocation().equals(location.add(new Location(0,1))))
+                )) {
                     toKill.add(l);
                     SomeoneKilled = true;
                     break;
                 }
-            }
+
         }
         int chanceOfSpreading = random.nextInt(100);
         if (spreadingProbability >= chanceOfSpreading) {
             spreadingLocations.add(chooseNewLocation(getLocation()));
             return new Spreading(spreadingLocations, toKill);
         }
-        if(SomeoneKilled)return new Spreading(new Vector<Location>(),toKill);
+        if(SomeoneKilled)return new Spreading(new Vector<>(),toKill);
         else return new DoNothing();
     }
     @Override

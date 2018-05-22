@@ -15,7 +15,6 @@ public class World {
     public Vector<Organism> organisms;//multiset<edu.pg.virtualworld.organisms.Organism*>
     private int numberOfLogs = 0, numberOfTurns=0;
     private Vector<String> allLogs;
-    private Boolean newWorldLoading = false;
     private Logger logger;
 
     public World(int width, int height, Logger logger){
@@ -33,23 +32,8 @@ public class World {
         return height;
     }
 
-    //to zrobic w dialogu!!!
-//    private void writeLegend() {
-//        for (int i = 0; i < 5; i++) {
-//            gotoxy(START_X_LEGEND, START_Y_LEGEND + i);
-//            if (i == 0)cout << "author: Anna Przybycien 172126";
-//            if (i == 1)cout << "arrows - control human, p -superpower";
-//            if (i == 2)cout << "s - save game to file";
-//            if (i == 3)cout << "l - load game from file";
-//            if (i == 4)cout << "esc - end game";
-//        }
-//    }
     private void writeLog(String log) {
        logger.log(log);
-    }
-    private void writeLog() {
-       // cout << "Turn: "<<numberOfTurns;
-//moze jakas updateTurns w dialogu???
     }
     public Organism whoIsThere(Location location) {
         handleWorldsEdges(location);
@@ -64,27 +48,17 @@ public class World {
         if (location.x == height)location.x = 0;
         if (location.y < 0)location.y = width - 1;
         if (location.y == width)location.y = 0;
-        //tutaj dostaje lokacje i patrze czy brzegi
-        //uzyc mozna tego w whoIsThere, a nawet trzeba
         return location;
     }
 
     public Boolean playRound() {
         Vector<Organism> tmpOrganisms = new Vector<>(organisms);//jak w trakcie tury dodam cos do organizmow to nie moge iterowac po czyms do czego dodaje
         while(!tmpOrganisms.isEmpty()){
-            if (newWorldLoading) {
-                newWorldLoading = false;
-                break;
-            }
-            if ((tmpOrganisms.elementAt(0)).getSymbol() == 'H')writeLog("Your turn!");
-            //bool killedOneself = false;
-            //MainDialog.drawBoard(width,height,this,MainDialog.labels);
+            //if ((tmpOrganisms.elementAt(0)).getSymbol() == 'H')writeLog("Your turn!");
             if (executeActionsAndCheckEndOfGame(tmpOrganisms.elementAt(0),
                     (tmpOrganisms.elementAt(0)).action(organisms), tmpOrganisms))return false;
         }
         Collections.sort(organisms);
-        //OrganismGenerator.sort(edu.pg.virtualworld.organisms);
-        //MainDialog.drawBoard(width,height,this,MainDialog.labels);
         return true;
     }
     private Boolean executeActionsAndCheckEndOfGame(Organism organism, Action action, Vector<Organism> tmpOrganisms) {
@@ -94,7 +68,7 @@ public class World {
             Location location = action.getMove();
             Organism organismAlreadyThere = whoIsThere(location);
             if (organismAlreadyThere == null) {
-                writeLog(organism.getName() + " moving to " + location.y + " " + location.x);
+                //writeLog(organism.getName() + " moving to " + location.y + " " + location.x);
                 organism.setLocation(location);
             }
             else {//kolizje
@@ -111,10 +85,13 @@ public class World {
                 if (organismAlreadyThere == null && organisms.size()<fields) {
                     Organism newOrganism = OrganismGenerator.getOrganism(organism.getSymbol());
                     newOrganism.setLocation(location);
-                    writeLog(organism.getName() + " is spreading to " + location.y + " " + location.x);
+                    //writeLog(organism.getName() + " is spreading to " + location.y + " " + location.x);
                     organisms.add(newOrganism);
                 }
             }
+            if(!action.kills().isEmpty()) performKillingSpree(action.kills(),organism,null,tmpOrganisms);
+            //performKillingSpree(collision.kills(), organism, organismAlreadyThere, tmpOrganisms);
+
         }
         if (action.isActivatingSpecialAbility()) {
             writeLog(organism.getName() + " just activated " + action.getAbility());
@@ -122,7 +99,7 @@ public class World {
         tmpOrganisms.remove(0);
         if (!(action.isDoingNothing()))
             numberOfTurns++;
-        if (!killedOneself && !newWorldLoading) organism.growOlder();
+        if (!killedOneself) organism.growOlder();
         return false;
     }
 
@@ -178,27 +155,26 @@ public class World {
         Boolean killedOneself = false;
         if (collision.isReproducing()) {
             Location location = collision.getReproduce();//musze obsluzyc teraz boki planszy!!!
-            writeLog(organism.getName() + " trying to reproduce on " + location.y + " " + location.x);
+            //writeLog(organism.getName() + " trying to reproduce on " + location.y + " " + location.x);
             Organism organismOnPlace = whoIsThere(location);
             if (organismOnPlace == null && organisms.size()<fields) {
                 writeLog("Successfully reproduced!");
                 Organism child = OrganismGenerator.getOrganism(organism.getSymbol());
                 child.setLocation(location);
                 organisms.add(child);
-                //MainDialog.drawBoard(width,height,this,MainDialog.labels);
             }
         }
         if (collision.isFighting()) {
-            writeLog(organism.getName() + " is trying to eat " + organismAlreadyThere.getName());
+            //writeLog(organism.getName() + " is trying to eat " + organismAlreadyThere.getName());
             killedOneself = performKillingSpree(collision.kills(), organism, organismAlreadyThere, tmpOrganisms);
-            if (!killedOneself) {//tutaj cos sie nie zabija:C
+            if (!killedOneself) {
                 organism.setLocation(collision.getFight());
             }
         }
         if (collision.isTryingToCatchIt()) {
             writeLog(organism.getName() + " is trying to catch " + organismAlreadyThere.getName());
             Location l = collision.getCatch();
-            writeLog(organismAlreadyThere.getName() + " is trying to run away to " + l.y + " " + l.x);
+            //writeLog(organismAlreadyThere.getName() + " is trying to run away to " + l.y + " " + l.x);
             Organism organismOnPlace = whoIsThere(l);
             if (organismOnPlace == null) {//rozpatrzec sukces w ucieczce
                 writeLog(organismAlreadyThere.getName() + " succesfully run away!");
@@ -207,7 +183,7 @@ public class World {
                 //organism zmienia lokacje na location z getmove(tam gdzie byl organismAlreadyThere, mozna najpierw)
                 //organismAlreadyThere zmienia swoja lokacje na ta z getcatch
             }
-            else {//rozpatrzec porazke z ucieczka
+            else {
                 writeLog(organismAlreadyThere.getName() + " didn't manage to run away!");
                 Location possibleLocation = organismAlreadyThere.getLocation();
                 killedOneself = performKillingSpree(collision.kills(), organism, organismAlreadyThere, tmpOrganisms);
@@ -222,7 +198,7 @@ public class World {
     }
 
 
-    //tutaj zabijamy i sprawdzamy czy nazs organism sie nie zabil od razu
+    //tutaj zabijamy i sprawdzamy czy nasz organism sie nie zabil od razu
     private Boolean performKillingSpree(Vector<Organism>killed, Organism killer,
                                         Organism organismAlreadyThere, Vector<Organism> tmpOrganisms) {
         Boolean killedOneself = false;
@@ -232,7 +208,7 @@ public class World {
             if (!victim.isImmuneToKillingBy(killer)) {
                 if (victim.getLocation() == killer.getLocation()) {
                     killedOneself = true;
-                    nameOfKiller = organismAlreadyThere.getName();
+                    if(organismAlreadyThere!=null) nameOfKiller = organismAlreadyThere.getName();
                 }
                 if (victim.isIncreasingStrength()) {
                     killer.setStrength(killer.getStrength() + victim.getIncrease());
@@ -265,5 +241,9 @@ public class World {
             if(o instanceof Human)return (Human)o;
         }
         return null;
+    }
+    public void createNewWorld(){
+        killAllOrganisms();
+        organisms = OrganismGenerator.getInitialOrganisms(width, height);
     }
 }

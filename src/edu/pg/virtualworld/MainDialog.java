@@ -25,7 +25,7 @@ public class MainDialog extends JFrame {
     private JPanel board;
     private JButton loadButton;
     private JButton newGameButton;
-    private JTextField authorAnnaPrzybycien172126TextField;
+    private JTextField legend;
     private JButton pauseButton;
     private MouseListener mouseListener;
     private static Drawer drawer;
@@ -46,7 +46,7 @@ public class MainDialog extends JFrame {
                         popUp(world,l);
                         drawBoard(width,height,world,labels);
                         timer.start();
-                    }//wyswietl popup, dodaj organizm do organizmow, posortuj
+                    }
                     else logMessage("Field taken");
                 }
 
@@ -74,6 +74,26 @@ public class MainDialog extends JFrame {
             labels[i].setSize(50,50);
         }
         drawBoard(width,height,world,labels);
+    }
+    public void drawBoard(int width, int height, World world, JButton[] labels) {
+        int i = 0;
+
+        for (int k = 0; k < height; k++) {
+            for (int j = 0; j < width; j++) {
+                for (int l = 0; l < world.organisms.size(); l++) {
+                    if (world.organisms.elementAt(l).getLocation().equals(new Location(k, j))) {
+                        labels[i].setText(world.organisms.elementAt(l).getSymbol() + "");
+                        labels[i].setBackground(world.organisms.elementAt(l).getColor());
+                        break;
+                    } else {
+                        labels[i].setText("");
+                        labels[i].setBackground(Color.GRAY);
+                    }
+                }
+                i++;
+            }
+        }
+        board.updateUI();
     }
     private void popUp(World world,Location location){
         JPanel panel = new JPanel();
@@ -140,11 +160,9 @@ public class MainDialog extends JFrame {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         ((DefaultCaret) logTextArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
-
         logTextArea.updateUI();
 
-        saveButton.addActionListener(actionEvent -> {//wywolanie save ze swiata
+        saveButton.addActionListener(actionEvent -> {
             timer.stop();
             //JFileChooser fileChooser = new JFileChooser();
             if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -175,6 +193,8 @@ public class MainDialog extends JFrame {
             timer.start();
         });
         newGameButton.addActionListener(actionEvent -> {//wywolanie save ze swiata
+            world.createNewWorld();
+            logTextArea.setText("");
             logMessage("New game!");
         });
         pauseButton.addActionListener(actionEvent -> {//wywolanie save ze swiata
@@ -212,26 +232,7 @@ public class MainDialog extends JFrame {
         // add your code here if necessary
         dispose();
     }
-    public void drawBoard(int width, int height, World world, JButton[] labels) {
-        int i = 0;
 
-        for (int k = 0; k < height; k++) {
-            for (int j = 0; j < width; j++) {
-                for (int l = 0; l < world.organisms.size(); l++) {
-                    if (world.organisms.elementAt(l).getLocation().equals(new Location(k, j))) {
-                        labels[i].setText(world.organisms.elementAt(l).getSymbol() + "");
-                        labels[i].setBackground(world.organisms.elementAt(l).getColor());
-                        break;
-                    } else {
-                        labels[i].setText("" + i);
-                        labels[i].setBackground(Color.GRAY);
-                    }
-                }
-                i++;
-            }
-        }
-        board.updateUI();
-    }
     public static void main(String[] args) {
         drawer=new Drawer();
         int height=Integer.parseInt(JOptionPane.showInputDialog("Height: "));
