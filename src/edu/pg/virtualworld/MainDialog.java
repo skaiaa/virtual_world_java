@@ -219,7 +219,7 @@ public class MainDialog extends JFrame {
             for (int j = 0; j < width; j++) {
                 for (int l = 0; l < world.organisms.size(); l++) {
                     if (world.organisms.elementAt(l).getLocation().equals(new Location(k, j))) {
-                        labels[i].setText(world.organisms.elementAt(l).getSymbol() + "" + l);
+                        labels[i].setText(world.organisms.elementAt(l).getSymbol() + "");
                         labels[i].setBackground(world.organisms.elementAt(l).getColor());
                         break;
                     } else {

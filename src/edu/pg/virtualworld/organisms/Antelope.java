@@ -1,5 +1,6 @@
 package edu.pg.virtualworld.organisms;
 
+import java.awt.*;
 import java.util.Random;
 
 public class Antelope extends Animal {
@@ -14,5 +15,9 @@ public class Antelope extends Animal {
         Random random=new Random();
         if (random.nextInt(100) < 50) return true;
         else return false;
+    }
+    @Override
+    public Color getColor() {
+        return new Color(153, 102, 51);
     }
 }

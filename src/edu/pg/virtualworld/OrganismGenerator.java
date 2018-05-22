@@ -15,16 +15,16 @@ public class OrganismGenerator {
     }
 
     public static Vector<Organism> getInitialOrganisms(int width, int height) {
-        String allSymbols = "ggggduuuuusbAAATTTFFF";//bardzo wazny string
+        String allSymbols = "WAFTSbguds";//bardzo wazny string
         Vector<Organism> initialOrganisms=new Vector<>();
         for (int i = 0; i < allSymbols.length(); i++) {//tutaj robie po jednym kazdego rodzaju
             initialOrganisms.add(getOrganism(allSymbols.charAt(i)));
         }
-        int k;//tutaj sa losowe zwierzaki
-//        for (int i = 0; i < 0.2*width*height-allSymbols.length(); i++) {
-//            k= (int)Math.random() * allSymbols.length();
-//            initialOrganisms.add(getOrganism(allSymbols.charAt(k)));
-//        }
+        //tutaj sa losowe zwierzaki
+        Random random =new Random();
+        for (int i = 0; i < 0.2*width*height-allSymbols.length(); i++) {
+            initialOrganisms.add(getOrganism(allSymbols.charAt(random.nextInt(allSymbols.length()))));
+        }
         initialOrganisms.add(getOrganism('H'));//dodanie czlowieka na koniec
         for (Organism i:initialOrganisms) {
             i.setLocation(getFreeAndRandomLocation(initialOrganisms, width, height));

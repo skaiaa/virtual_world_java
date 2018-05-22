@@ -5,6 +5,7 @@ import edu.pg.virtualworld.actions.Action;
 import edu.pg.virtualworld.actions.DoNothing;
 import edu.pg.virtualworld.actions.Spreading;
 
+import java.awt.*;
 import java.util.Random;
 import java.util.Vector;
 
@@ -21,5 +22,9 @@ public class Dandelion extends Plant {
             return new Spreading(spreadingLocations, new Vector<>());
         }
         return new DoNothing();
+    }
+    @Override
+    public Color getColor() {
+        return new Color(255, 255, 102);
     }
 }

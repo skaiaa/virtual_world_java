@@ -17,12 +17,12 @@ public class Human extends Animal{
     protected Boolean waitingForArrow=false;
     protected String specialAbilityName="magic potion";
     public Human() {super(5);}
-    public String getName(){return"Tomek";}
+    public String getName(){return"pan Marcin";}
     public int getInitiative() {return 4;}
 
     @Override
     public Color getColor() {
-        return Color.MAGENTA;
+        return new Color(255, 153, 255);
     }
 
     public char getSymbol(){return'H';}
@@ -31,6 +31,7 @@ public class Human extends Animal{
                 " "+strength+" "+getLocation().x+" "+getLocation().y+
                 " "+magicPotion+" "+usingSpecialAbility+" "+waitingForArrow+"\n";
     }
+
     public void getStatsFromFile(String[] line){
         super.getStatsFromFile(line);
         magicPotion=Integer.parseInt(line[5]);

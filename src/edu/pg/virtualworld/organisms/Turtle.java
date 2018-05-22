@@ -5,6 +5,7 @@ import edu.pg.virtualworld.actions.Action;
 import edu.pg.virtualworld.actions.DoNothing;
 import edu.pg.virtualworld.actions.Moving;
 
+import java.awt.*;
 import java.util.Random;
 import java.util.Vector;
 public class Turtle extends Animal {
@@ -33,5 +34,9 @@ public class Turtle extends Animal {
         if (attacker.getStrength() < 5) return true;
         else return false;
         }
+    @Override
+    public Color getColor() {
+        return new Color(0, 102, 0);
+    }
 }
 

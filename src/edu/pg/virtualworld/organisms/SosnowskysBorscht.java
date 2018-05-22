@@ -7,6 +7,7 @@ import edu.pg.virtualworld.actions.Spreading;
 import edu.pg.virtualworld.organisms.Organism;
 import edu.pg.virtualworld.organisms.Plant;
 
+import java.awt.*;
 import java.util.Random;
 import java.util.Vector;
 
@@ -37,5 +38,9 @@ public class SosnowskysBorscht extends Plant {
         }
         if(SomeoneKilled)return new Spreading(new Vector<Location>(),toKill);
         else return new DoNothing();
+    }
+    @Override
+    public Color getColor() {
+        return new Color(153, 0, 0);
     }
 }
