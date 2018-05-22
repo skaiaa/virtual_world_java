@@ -11,8 +11,7 @@ import java.util.Vector;
 
 public abstract class Plant extends Organism {
     protected int spreadingProbability;
-    //protected Vector<Location> spreadingLocations=new Vector<>();
-    public Plant(int Probability) { spreadingProbability = Probability; }
+    Plant(int Probability) { spreadingProbability = Probability; }
     public int getInitiative() { return 0; }
     public int getStrength() { return 0; }
     public void setStrength(int s) { }

@@ -6,14 +6,13 @@ import edu.pg.virtualworld.organisms.Organism;
 import java.util.Vector;
 
 public class Moving extends Action {
-    protected Location newLocation;
-    protected Vector<Organism> toKill;//edu.pg.virtualworld.organisms.Organism*
-    public Moving(Location newLocation1, Vector<Organism>toKill1){
-        newLocation=newLocation1;
-        toKill=toKill1;
+    private Location newLocation;
+    private Vector<Organism> toKill;
+    public Moving(Location newLocation, Vector<Organism>toKill){
+        this.newLocation=newLocation;
+        this.toKill=toKill;
     }
     public Boolean isMoving() { return true; }
     public Location getMove() { return newLocation; }
-    public Vector<Organism> kills() { return toKill; }//edu.pg.virtualworld.organisms.Organism*
-        //virtual void moveTo(Location location){}
-};
+    public Vector<Organism> kills() { return toKill; }
+}

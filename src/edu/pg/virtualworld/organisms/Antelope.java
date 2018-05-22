@@ -13,8 +13,7 @@ public class Antelope extends Animal {
     public String getName() { return "Antelope"; }
     public Boolean isRunningAway() {
         Random random=new Random();
-        if (random.nextInt(100) < 50) return true;
-        else return false;
+        return(random.nextInt(100) < 50);
     }
     @Override
     public Color getColor() {

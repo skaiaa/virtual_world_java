@@ -4,8 +4,6 @@ import edu.pg.virtualworld.Location;
 import edu.pg.virtualworld.actions.Action;
 import edu.pg.virtualworld.actions.DoNothing;
 import edu.pg.virtualworld.actions.Spreading;
-import edu.pg.virtualworld.organisms.Organism;
-import edu.pg.virtualworld.organisms.Plant;
 
 import java.awt.*;
 import java.util.Random;
@@ -19,7 +17,6 @@ public class SosnowskysBorscht extends Plant {
     public Action action(Vector<Organism> organisms) {
         Random random=new Random();
         Vector<Location> spreadingLocations=new Vector<>();
-        String animalSymbols = "WSFATH";
         Vector<Organism> toKill=new Vector<>();
         Boolean SomeoneKilled = false;
         for (Organism l:organisms) {

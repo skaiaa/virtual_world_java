@@ -3,46 +3,34 @@ package edu.pg.virtualworld.organisms;
 import edu.pg.virtualworld.Location;
 import edu.pg.virtualworld.actions.*;
 
-import java.awt.*;
 import java.util.Random;
 import java.util.Vector;
 
 public abstract class Animal extends Organism {
-    protected int step = 1, strength;
-
-    public Animal(int initialStrength) {
+    int step = 1, strength;
+    Animal(int initialStrength) {
         strength = initialStrength;
+    }
+    void setStep(int newStep) {
+        step = newStep;
     }
 
     public int getStrength() {
         return strength;
     }
-
     public void setStrength(int s) {
         strength = s;
     }
-
-    @Override
-    public Color getColor() {
-        return Color.PINK;
-    }
-
-    public void setStep(int newStep) {
-        step = newStep;
-    }
-
     public String getInfoForSave() {
         return age + " " + step + " " + strength + " " + getLocation().x + " " + getLocation().y + "\n";
     }
-
-    public void getStatsFromFile(String[] line) {//stringstream&
+    public void getStatsFromFile(String[] line) {
         age = Integer.parseInt(line[0]);
         step = Integer.parseInt(line[1]);
         strength = Integer.parseInt(line[2]);
         location.x = Integer.parseInt(line[3]);
         location.y = Integer.parseInt(line[4]);
     }
-
     public Location chooseNewLocation(Location fromWhere) {
         Random random=new Random();
         Location changeInLocation = new Location(0, 0);
@@ -54,12 +42,10 @@ public abstract class Animal extends Organism {
         }
         return new Location(fromWhere.add(changeInLocation));
     }
-
-    public Action action(Vector<Organism> organisms) {//edu.pg.virtualworld.actions.Action* edu.pg.virtualworld.organisms.Organism*
-        return new Moving(chooseNewLocation(getLocation()), new Vector<Organism>());//Organims* }
-        // edu.pg.virtualworld.actions.Action* collision(edu.pg.virtualworld.organisms.Organism* withOrganism, Location place);
+    public Action action(Vector<Organism> organisms) {
+        return new Moving(chooseNewLocation(getLocation()), new Vector<>());
     }
-    public Action collision(Organism withOrganism, Location place) {//edu.pg.virtualworld.actions.Action* edu.pg.virtualworld.organisms.Organism*
+    public Action collision(Organism withOrganism, Location place) {
         Vector<Organism>toKill=new Vector<>();
         if (withOrganism.getSymbol() == getSymbol())return new Reproducing(chooseNewLocation(place));
         else {

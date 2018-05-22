@@ -1,6 +1,8 @@
 package edu.pg.virtualworld;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import edu.pg.virtualworld.buttons.ButtonGenerator;
+import edu.pg.virtualworld.buttons.HexButtonGenerator;
+import edu.pg.virtualworld.buttons.SquareButtonGenerator;
 import edu.pg.virtualworld.organisms.Human;
 import edu.pg.virtualworld.organisms.Organism;
 
@@ -19,24 +21,22 @@ public class MainDialog extends JFrame {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JButton saveButton;
-    public static JButton[] labels;
+    private JButton[] labels;
     private JTextArea logTextArea;
     private JScrollPane logsScrollPane;
     private JPanel board;
     private JButton loadButton;
     private JButton newGameButton;
-    private JTextField legend;
+    private JTextField legend; //used by form
     private JButton pauseButton;
-    private MouseListener mouseListener;
-    private static Drawer drawer;
-    public static Timer timer;
-    public JFileChooser fileChooser = new JFileChooser();
+    private Timer timer;
+    private JFileChooser fileChooser = new JFileChooser();
 
-    private void createLabels(int width, int height,World world) {
+    private void createLabels(int width, int height, World world, ButtonGenerator buttonGenerator) {
         labels = new JButton[height * width];
         for(int i=0;i<labels.length;i++){
             int idx=i;
-            labels[i] = new JButton();
+            labels[i] = buttonGenerator.create();
             labels[i].addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent mouseEvent) {
@@ -49,35 +49,18 @@ public class MainDialog extends JFrame {
                     }
                     else logMessage("Field taken");
                 }
-
-                @Override
-                public void mousePressed(MouseEvent mouseEvent) {
-
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent mouseEvent) {
-
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent mouseEvent) {
-
-                }
-
-                @Override
-                public void mouseExited(MouseEvent mouseEvent) {
-
-                }
+                @Override public void mousePressed(MouseEvent mouseEvent) { }
+                @Override public void mouseReleased(MouseEvent mouseEvent) { }
+                @Override public void mouseEntered(MouseEvent mouseEvent) { }
+                @Override public void mouseExited(MouseEvent mouseEvent) { }
             });
             labels[i].setOpaque(true);
             labels[i].setSize(50,50);
         }
         drawBoard(width,height,world,labels);
     }
-    public void drawBoard(int width, int height, World world, JButton[] labels) {
+    private void drawBoard(int width, int height, World world, JButton[] labels) {
         int i = 0;
-
         for (int k = 0; k < height; k++) {
             for (int j = 0; j < width; j++) {
                 for (int l = 0; l < world.organisms.size(); l++) {
@@ -118,16 +101,14 @@ public class MainDialog extends JFrame {
                 break;
         }
     }
-    public MainDialog(int width, int height) {
+    private MainDialog(int width, int height, ButtonGenerator bg) {
         setContentPane(contentPane);
         //setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         Logger logger=new Logger(logTextArea,logsScrollPane);
         World world=new World(width,height,logger);
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
-                .addKeyEventDispatcher(new KeyEventDispatcher() {
-                    @Override
-                    public boolean dispatchKeyEvent(KeyEvent keyEvent) {
+                .addKeyEventDispatcher(keyEvent ->  {
                         if(keyEvent.getID() == KeyEvent.KEY_PRESSED) {
                             if(keyEvent.getKeyCode()==KeyEvent.VK_ESCAPE)  onCancel();
                             Human myHuman=world.getHuman();
@@ -135,8 +116,8 @@ public class MainDialog extends JFrame {
                         }
                         return false;
                     }
-                });
-        createLabels(width, height,world);
+                );
+        createLabels(width, height,world,bg);
         board.setLayout(new GridLayout(width, height));
         for (int i = 0; i < width * height; i++) {
             board.add(labels[i]);
@@ -164,7 +145,6 @@ public class MainDialog extends JFrame {
 
         saveButton.addActionListener(actionEvent -> {
             timer.stop();
-            //JFileChooser fileChooser = new JFileChooser();
             if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();//  save to file
                 File out = new File(file.getAbsolutePath());
@@ -210,51 +190,42 @@ public class MainDialog extends JFrame {
             }
 
         });
-        timer=new Timer(1500, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
+        timer=new Timer(1500,actionEvent-> {
                 drawBoard(world.getWidth(),world.getHeight(),world,labels);
                 world.playRound();
                 drawBoard(world.getWidth(),world.getHeight(),world,labels);
                 board.updateUI();
             }
-        });
+        );
         timer.setRepeats(true);
         timer.start();
     }
 
     private void onOK() {
-        // add your code here
         dispose();
     }
 
     private void onCancel() {
-        // add your code here if necessary
         dispose();
     }
 
     public static void main(String[] args) {
-        drawer=new Drawer();
         int height=Integer.parseInt(JOptionPane.showInputDialog("Height: "));
         int width=Integer.parseInt(JOptionPane.showInputDialog("Width: "));
-        MainDialog dialog = new MainDialog(width,height);
+        String whichButton = JOptionPane.showInputDialog("What kind of button (hex or square, default square): ");
+        ButtonGenerator bg;
+
+        if(whichButton.equals("hex")) bg=new HexButtonGenerator();
+        else bg=new SquareButtonGenerator();
+
+        MainDialog dialog = new MainDialog(width,height,bg);
         dialog.requestFocusInWindow();
         dialog.pack();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                dialog.requestFocusInWindow();
-            }
-        });
+        SwingUtilities.invokeLater(()->  dialog.requestFocusInWindow() );
         dialog.setVisible(true);
-        //JOptionPane.showMessageDialog(dialog, "Eggs are not supposed to be green.");
-        //System.exit(0);
     }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
+    private void createUIComponents() { //do forma
     }
-
     private void logMessage(String message) {
         logTextArea.append(message+"\n");
         logsScrollPane.getVerticalScrollBar().setValue(logsScrollPane.getVerticalScrollBar().getMaximum());

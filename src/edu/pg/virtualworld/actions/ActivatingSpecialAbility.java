@@ -5,11 +5,11 @@ import edu.pg.virtualworld.organisms.Organism;
 import java.util.Vector;
 
 public class ActivatingSpecialAbility extends Action {
-    protected String ability;
-    protected Vector<Organism>toKill;
-    public ActivatingSpecialAbility(String ability1, Vector<Organism>toKill1){
-        ability=ability1;
-        toKill=toKill1;
+    private String ability;
+    private Vector<Organism>toKill;
+    public ActivatingSpecialAbility(String ability, Vector<Organism>toKill){
+        this.ability=ability;
+        this.toKill=toKill;
     }
     public Boolean isActivatingSpecialAbility() { return true; }
     public String getAbility() { return ability; }

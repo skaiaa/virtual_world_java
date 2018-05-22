@@ -6,15 +6,15 @@ import edu.pg.virtualworld.organisms.Organism;
 import java.util.Vector;
 
 public class TryingToCatchIt extends Action {
-    protected Location newLocation;
-    protected Vector<Organism>toKill;//edu.pg.virtualworld.organisms.Organism*
-    public TryingToCatchIt(Location newLocation1, Vector<Organism>toKill1){
-        newLocation=newLocation1;
-        toKill=toKill1;
+    private Location newLocation;
+    private Vector<Organism>toKill;
+    public TryingToCatchIt(Location newLocation, Vector<Organism>toKill){
+        this.newLocation =newLocation;
+        this.toKill =toKill;
     }
     public Boolean isTryingToCatchIt() { return true; }
     public Location getCatch() { return newLocation; }
-    public Vector<Organism> kills() { return new Vector<Organism>(); }//edu.pg.virtualworld.organisms.Organism
+    public Vector<Organism> kills() { return new Vector<>(); }
 }
 
 

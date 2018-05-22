@@ -6,10 +6,10 @@ import edu.pg.virtualworld.organisms.Organism;
 import java.util.Vector;
 
 public class Fighting extends Action {
-    protected Location fightLocation;
-    protected Vector<Organism>toKill;//edu.pg.virtualworld.organisms.Organism*
-    public Fighting(Location fightLocation1, Vector<Organism>toKill1){
-        toKill=toKill1;
+    private Location fightLocation;
+    private Vector<Organism>toKill;
+    public Fighting(Location fightLocation1, Vector<Organism>toKill){
+        this.toKill=toKill;
         fightLocation=fightLocation1;
     }
     public Boolean isFighting() { return true; }

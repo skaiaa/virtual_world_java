@@ -1,9 +1,9 @@
 package edu.pg.virtualworld;
 
 public class Location {
-    public Location(int x1, int y1) {
-        x=x1;
-        y=y1;
+    public Location(int x, int y) {
+        this.x=x;
+        this.y =y;
     }
     public Location(Location newLocation){
         x=newLocation.x;
@@ -25,8 +25,7 @@ public class Location {
     public boolean equals(Object o) {
         if(o instanceof Location){
             Location l=(Location)o;
-            if(l.x==this.x && l.y == this.y) return true;
-            return false;
+            return(l.x==this.x && l.y == this.y);
         }
         else return super.equals(o);
     }

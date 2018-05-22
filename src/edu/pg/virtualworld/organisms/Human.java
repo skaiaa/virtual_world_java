@@ -11,11 +11,9 @@ import java.awt.event.KeyEvent;
 import java.util.Vector;
 
 public class Human extends Animal{
-    protected Location myMove=new Location(0,0);
-    protected int magicPotion=0;
-    protected int usingSpecialAbility=0;
-    protected Boolean waitingForArrow=false;
-    protected String specialAbilityName="magic potion";
+    private Location myMove=new Location(0,0);
+    private int magicPotion=0;
+    private int usingSpecialAbility=0;
     public Human() {super(5);}
     public String getName(){return"pan Marcin";}
     public int getInitiative() {return 4;}
@@ -29,15 +27,13 @@ public class Human extends Animal{
     public String getInfoForSave(){
         return age+" "+step+
                 " "+strength+" "+getLocation().x+" "+getLocation().y+
-                " "+magicPotion+" "+usingSpecialAbility+" "+waitingForArrow+"\n";
+                " "+magicPotion+" "+usingSpecialAbility+"\n";
     }
 
     public void getStatsFromFile(String[] line){
         super.getStatsFromFile(line);
         magicPotion=Integer.parseInt(line[5]);
         usingSpecialAbility=Integer.parseInt(line[6]);
-        //jeszcze waiting for arrow
-        //std::cout << "Found integer: " << n << "\n";
     }
     public int getStrength(){return strength+magicPotion;}
     public Action action(Vector<Organism> organisms){
@@ -47,7 +43,7 @@ public class Human extends Animal{
             myMove.changeTo(0,0);
             return new Moving(move, new Vector<>());
         }
-        else if (magicPotion == 5) return new ActivatingSpecialAbility(specialAbilityName, new Vector<>());
+        else if (magicPotion == 5) return new ActivatingSpecialAbility("magic potion", new Vector<>());
         else return new DoNothing();
     }
     public void growOlder(){

@@ -2,11 +2,14 @@ package edu.pg.virtualworld;
 
 import edu.pg.virtualworld.organisms.*;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.EmptyStackException;
+import java.util.Random;
+import java.util.Vector;
 
 public class OrganismGenerator {
     public static Location getFreeAndRandomLocation(Vector<Organism> organisms, int width, int height) {
-        if (organisms.size() >= width * height) throw new EmptyStackException();//throw exception("There's no place!");
+        if (organisms.size() >= width * height) throw new RuntimeException("There's no place!");
         Location randomLocation = Location.getRandomLocation(width, height);
         for (Organism i :organisms) {
             if (i.getLocation().equals(randomLocation)) return getFreeAndRandomLocation(organisms, width, height);
