@@ -1,13 +1,20 @@
 package edu.pg.virtualworld;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import edu.pg.virtualworld.organisms.Human;
+import edu.pg.virtualworld.organisms.Organism;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.util.Collections;
+import java.util.Vector;
 
 public class MainDialog extends JFrame {
+    private final Component modalToComponent=new Component() {
+    };
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -19,41 +26,84 @@ public class MainDialog extends JFrame {
     private JButton loadButton;
     private JButton newGameButton;
     private JTextField authorAnnaPrzybycien172126TextField;
+    private JButton pauseButton;
     private MouseListener mouseListener;
     private static Drawer drawer;
+    public static Timer timer;
+    public JFileChooser fileChooser = new JFileChooser();
 
     private void createLabels(int width, int height,World world) {
         labels = new JButton[height * width];
         for(int i=0;i<labels.length;i++){
+            int idx=i;
             labels[i] = new JButton();
+            labels[i].addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent mouseEvent) {
+                    Location l=new Location(idx/width,idx%width);
+                    if(world.whoIsThere(l)==null){
+                        timer.stop();
+                        popUp(world,l);
+                        drawBoard(width,height,world,labels);
+                        timer.start();
+                    }//wyswietl popup, dodaj organizm do organizmow, posortuj
+                    else logMessage("Field taken");
+                }
+
+                @Override
+                public void mousePressed(MouseEvent mouseEvent) {
+
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent mouseEvent) {
+
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent mouseEvent) {
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent mouseEvent) {
+
+                }
+            });
             labels[i].setOpaque(true);
             labels[i].setSize(50,50);
         }
         drawBoard(width,height,world,labels);
     }
-
+    private void popUp(World world,Location location){
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Please make a selection:"));
+        DefaultComboBoxModel box = new DefaultComboBoxModel<String>();
+        String s="WATSFgusbd";
+        Vector<Organism> org=new Vector<>();
+        for(int i=0;i<s.length();i++){
+            org.add(OrganismGenerator.getOrganism(s.charAt(i)));
+            box.addElement(org.elementAt(i).getName());
+        }
+        JComboBox comboBox = new JComboBox(box);
+        panel.add(comboBox);
+        int result = JOptionPane.showConfirmDialog(null, panel, "Organism:",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        switch (result) {
+            case JOptionPane.OK_OPTION:
+                org.elementAt(comboBox.getSelectedIndex()).setLocation(location);
+                world.organisms.add(org.elementAt(comboBox.getSelectedIndex()));
+                Collections.sort(world.organisms);
+                drawBoard(world.getWidth(),world.getHeight(),world,labels);
+                break;
+        }
+    }
     public MainDialog(int width, int height) {
         setContentPane(contentPane);
         //setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         Logger logger=new Logger(logTextArea,logsScrollPane);
         World world=new World(width,height,logger);
-        this.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent keyEvent) {
-                logger.log("Wcisniete!!!!!!!!!");
-            }
-
-            @Override
-            public void keyPressed(KeyEvent keyEvent) {
-                logger.log("Wcisniete!!!!!!!!!");
-            }
-
-            @Override
-            public void keyReleased(KeyEvent keyEvent) {
-
-            }
-        });
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
                 .addKeyEventDispatcher(new KeyEventDispatcher() {
                     @Override
@@ -61,9 +111,9 @@ public class MainDialog extends JFrame {
                         if(keyEvent.getID() == KeyEvent.KEY_PRESSED) {
                             if(keyEvent.getKeyCode()==KeyEvent.VK_ESCAPE)  onCancel();
                             Human myHuman=world.getHuman();
-                            if(myHuman!=null)myHuman.keyTyped(keyEvent);
+                            if(myHuman!=null) myHuman.keyTyped(keyEvent);
                         }
-                        return true;
+                        return false;
                     }
                 });
         createLabels(width, height,world);
@@ -95,19 +145,57 @@ public class MainDialog extends JFrame {
         logTextArea.updateUI();
 
         saveButton.addActionListener(actionEvent -> {//wywolanie save ze swiata
+            timer.stop();
+            //JFileChooser fileChooser = new JFileChooser();
+            if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();//  save to file
+                File out = new File(file.getAbsolutePath());
+                ObjectOutputStream output = null;
+                try {
+                    world.saveToFile(new FileOutputStream(out));
+                } catch (IOException e) {
+                    logger.log("Error saving file! "+e.getMessage());
+                }
+            }
             logMessage("Game saved!");
+            timer.start();
         });
         loadButton.addActionListener(actionEvent -> {//wywolanie save ze swiata
+            timer.stop();
+            if (fileChooser.showOpenDialog(modalToComponent) == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                try {
+                    world.loadFromFile(new FileInputStream(file));
+                } catch (FileNotFoundException e) {
+                    logger.log("Cannot open file!");
+                }
+                // load from file
+            }
             logMessage("Game loaded!");
+            timer.start();
         });
         newGameButton.addActionListener(actionEvent -> {//wywolanie save ze swiata
             logMessage("New game!");
         });
-        Timer timer=new Timer(1000, new ActionListener() {
+        pauseButton.addActionListener(actionEvent -> {//wywolanie save ze swiata
+            if(timer.isRunning()) {
+                timer.stop();
+                pauseButton.setText("Resume");
+                logMessage("Game paused!");
+            }
+            else {
+                timer.start();
+                pauseButton.setText("Pause");
+                logMessage("Game resumed!");
+            }
+
+        });
+        timer=new Timer(1500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                drawBoard(world.getWidth(),world.getHeight(),world,labels);
                 world.playRound();
-                //drawBoard(height,width,labels);
+                drawBoard(world.getWidth(),world.getHeight(),world,labels);
                 board.updateUI();
             }
         });
@@ -124,7 +212,7 @@ public class MainDialog extends JFrame {
         // add your code here if necessary
         dispose();
     }
-    public static void drawBoard(int width, int height, World world, JButton[] labels) {
+    public void drawBoard(int width, int height, World world, JButton[] labels) {
         int i = 0;
 
         for (int k = 0; k < height; k++) {
@@ -142,12 +230,12 @@ public class MainDialog extends JFrame {
                 i++;
             }
         }
+        board.updateUI();
     }
     public static void main(String[] args) {
         drawer=new Drawer();
         int height=Integer.parseInt(JOptionPane.showInputDialog("Height: "));
         int width=Integer.parseInt(JOptionPane.showInputDialog("Width: "));
-
         MainDialog dialog = new MainDialog(width,height);
         dialog.requestFocusInWindow();
         dialog.pack();

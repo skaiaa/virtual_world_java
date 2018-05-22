@@ -6,6 +6,7 @@ import edu.pg.virtualworld.actions.ActivatingSpecialAbility;
 import edu.pg.virtualworld.actions.DoNothing;
 import edu.pg.virtualworld.actions.Moving;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 
@@ -18,6 +19,12 @@ public class Human extends Animal{
     public Human() {super(5);}
     public String getName(){return"Tomek";}
     public int getInitiative() {return 4;}
+
+    @Override
+    public Color getColor() {
+        return Color.MAGENTA;
+    }
+
     public char getSymbol(){return'H';}
     public String getInfoForSave(){
         return age+" "+step+
@@ -34,8 +41,11 @@ public class Human extends Animal{
     public int getStrength(){return strength+magicPotion;}
     public Action action(Vector<Organism> organisms){
         //keyTyped(new KeyEvent());
-        //if (waitingForArrow)keyPressed(_getch());
-        if (!myMove.equals(new Location(0, 0))) return new Moving(getLocation().add(myMove), new Vector<>());
+        if (!myMove.equals(new Location(0, 0))){
+            Location move =getLocation().add(myMove);
+            myMove.changeTo(0,0);
+            return new Moving(move, new Vector<>());
+        }
         else if (magicPotion == 5) return new ActivatingSpecialAbility(specialAbilityName, new Vector<>());
         else return new DoNothing();
     }

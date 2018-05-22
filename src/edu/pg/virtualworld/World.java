@@ -5,6 +5,8 @@ import edu.pg.virtualworld.organisms.Human;
 import edu.pg.virtualworld.organisms.Organism;
 import sun.rmi.runtime.Log;
 
+import java.io.*;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
 
@@ -23,6 +25,14 @@ public class World {
         this.logger=logger;
         organisms = OrganismGenerator.getInitialOrganisms(width, height);
     }
+
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight(){
+        return height;
+    }
+
     //to zrobic w dialogu!!!
 //    private void writeLegend() {
 //        for (int i = 0; i < 5; i++) {
@@ -41,7 +51,7 @@ public class World {
        // cout << "Turn: "<<numberOfTurns;
 //moze jakas updateTurns w dialogu???
     }
-    private Organism whoIsThere(Location location) {
+    public Organism whoIsThere(Location location) {
         handleWorldsEdges(location);
         for (Organism o : organisms) {
             if (o.getLocation().equals(location))
@@ -60,11 +70,8 @@ public class World {
     }
 
     public Boolean playRound() {
-        //string log;
         Vector<Organism> tmpOrganisms = new Vector<>(organisms);//jak w trakcie tury dodam cos do organizmow to nie moge iterowac po czyms do czego dodaje
-        //writeLegend();
         while(!tmpOrganisms.isEmpty()){
-            //writeLog();
             if (newWorldLoading) {
                 newWorldLoading = false;
                 break;
@@ -77,7 +84,7 @@ public class World {
         }
         Collections.sort(organisms);
         //OrganismGenerator.sort(edu.pg.virtualworld.organisms);
-        MainDialog.drawBoard(width,height,this,MainDialog.labels);
+        //MainDialog.drawBoard(width,height,this,MainDialog.labels);
         return true;
     }
     private Boolean executeActionsAndCheckEndOfGame(Organism organism, Action action, Vector<Organism> tmpOrganisms) {
@@ -118,63 +125,51 @@ public class World {
         if (!killedOneself && !newWorldLoading) organism.growOlder();
         return false;
     }
-    //naciskanie klawiszy tez gdzie indziej
-//    private Boolean manageKeysPressed(int key) {
-//        switch (key) {
-//            case KB_ESCAPE:
-//                return true;
-//            break;
-//            case 's':
-//                saveToFile();
-//                break;
-//            case 'l':
-//                loadFromFile();
-//                break;
-//            default:
-//                break;
-//        }
-//        return false;
-//    };
-    private void saveToFile() {
-//        ofstream out(readNameOfFile());
-//        out << width <<" "<<height<<"\n";
-//        for (vector<edu.pg.virtualworld.organisms.Organism*>::iterator i = edu.pg.virtualworld.organisms.begin(); i != edu.pg.virtualworld.organisms.end(); ++i) {
-//            string info= (*i)->getInfoForSave();//to_string na char zrobi decimala
-//            out << (*i)->getSymbol() << " ";
-//            out << info;
-//        }
-//        out.close();
+
+    public void saveToFile(FileOutputStream os) {
+        PrintWriter p = new PrintWriter(os);
+        p.println(width + " " + height);
+        for (Organism o : organisms) {
+            String info = o.getInfoForSave();//to_string na char zrobi decimala
+            p.println(o.getSymbol() + " " + info);
+        }
+        p.close();
 
     }
-    private String readNameOfFile() {
-//        writeLog("Name of file: ");
-//        string nameOfFile;
-//        gotoxy(START_X_LOGS, START_Y_LOGS + numberOfLogs);
-//        //writeLog("");//zeby zejsc jeden w dol
-//        cin >> nameOfFile;
-//        nameOfFile = "C:\\Users\\aniap\\source\\repos\\swiat_wg_pana_Tomka\\" + nameOfFile + ".txt";
-//        return nameOfFile;
-        return new String("ech");
-    }
-    private void loadFromFile() {
-//        ifstream newWorld(readNameOfFile());
-//        if (newWorld.is_open()) {
-//            newWorldLoading = true;
-//            killAllOrganisms();
-//            newWorld >> width >> height;
-//            string line;
-//            std::getline(newWorld, line);
-//            edu.pg.virtualworld.organisms.Organism* newOrganism;
-//            while (std::getline(newWorld, line))
-//            {
-//                newOrganism = organismGenerator::getOrganism(line[0]);
-//                line.erase(line.begin());
-//                stringstream stats(line);
-//                newOrganism->getStatsFromFile(stats);
-//                //sczytaj staty ze strinu line dla organizmów
-//                edu.pg.virtualworld.organisms.push_back(newOrganism);
-//            }
-//        }
+
+    public void loadFromFile(FileInputStream is) {
+        //newWorldLoading = true;
+        killAllOrganisms();
+        BufferedReader r = new BufferedReader(new InputStreamReader(is));
+        String[] dimensions= new String[0];
+        try {
+            dimensions = r.readLine().split(" ");
+        } catch (IOException e) {
+            logger.log("Cannot read dimensions!");
+        }
+        width=Integer.parseInt(dimensions[0]);
+        height=Integer.parseInt(dimensions[1]);
+
+        String line = null;
+        try {
+            line = r.readLine();
+            while(line!=null){
+                if(line.isEmpty()){
+                    line=r.readLine();
+                    continue;
+                }
+                String[] stats=line.split(" ");
+                Organism o=OrganismGenerator.getOrganism(stats[0].charAt(0));
+                o.getStatsFromFile(Arrays.copyOfRange(stats,1,stats.length));
+                organisms.add(o);
+                line=r.readLine();
+            }
+        } catch (IOException e) {
+            logger.log("Cannot read organisms!");
+        }
+        catch (StringIndexOutOfBoundsException e){
+            logger.log(":C");
+        }
     }
     private Boolean executeCollisionsAndCheckIfKilledOneself(Organism organism,
                                                              Action collision,
